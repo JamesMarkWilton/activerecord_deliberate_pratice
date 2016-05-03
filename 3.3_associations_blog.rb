@@ -4,14 +4,41 @@ ActiveRecord::Schema.define do
   self.verbose = false
 
   # MIGRATIONS
-  # <-- your work goes here
+  create_table :users do |t|
+    t.string :name
+  end
+
+  create_table :posts do |t|
+    t.string  :title
+    t.text    :body
+    t.integer :user_id
+  end
+
+  create_table :comments do |t|
+    t.text    :comment
+    t.integer :user_id
+    t.integer :post_id
+  end
 end
 
 
 # MODELS
-# <-- your work goes here
+class User < ActiveRecord::Base
+  has_many :posts
+  has_many :comments, through: :posts
+  has_many :commenters, through: :posts
+end
 
+class Post < ActiveRecord::Base
+  has_many   :comments
+  belongs_to :user
+  has_many   :commenters, through: :comments, source: :user
+end
 
+class Comment < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :post
+end
 # TESTS
 class BlogTest < Minitest::Test
   def test_users_know_their_posts

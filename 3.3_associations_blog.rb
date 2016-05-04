@@ -1,3 +1,4 @@
+# Diagram: https://gist.github.com/JoshCheek/e60015c983bbe842cffeb02b75452937
 require_relative 'setup'
 ActiveRecord::Schema.define do
   self.verbose = false

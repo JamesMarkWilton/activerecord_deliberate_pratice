@@ -14,7 +14,15 @@ ActiveRecord::Schema.define do
     t.string  :name
   end
 
-  # <-- your work goes here
+  create_table :paintings do |t|
+    t.string  :name
+    t.integer :price
+    t.integer :artist_id
+  end
+
+  create_table :artists do |t|
+    t.string  :name
+  end
 end
 
 class Car < ActiveRecord::Base
@@ -31,7 +39,13 @@ class Model < ActiveRecord::Base
   has_many :cars
 end
 
+class Painting < ActiveRecord::Base
+  belongs_to :artist
+end
 
+class Artist < ActiveRecord::Base
+  has_many :paintings
+end
 # =====  Examples  =====
 # -----  new  -----
 #   makes the object in memory without saving it to the db
@@ -148,13 +162,13 @@ chevy.cars.pluck(:year)
 
 class MakingRecords < Minitest::Test
   def test_paintings_have_names
-    painting = "??" # <-- your work goes here
+    painting =   Painting.new name: "Mona Lisa"
     assert_equal 'Mona Lisa', painting.name
     assert_equal 0, Painting.count
   end
 
   def test_paintings_have_prices
-    painting = "??" # <-- your work goes here
+    painting =   Painting.new name: "Mona Lisa", price: 123_456_99
     assert_equal 123_456_99, painting.price
     assert_equal 0, Painting.count
   end
@@ -163,29 +177,32 @@ class MakingRecords < Minitest::Test
     # keep in mind that you'll need to validate that the name is present
     painting = Painting.new
     painting.save
-    is_saved = painting.some_method # <-- your work goes here
+    is_saved = painting.new_record?
     assert_equal false, is_saved
 
     painting = Painting.new name: 'The Last Supper'
     painting.save
-    is_saved = painting.some_method # <-- your work goes here
+    is_saved = painting.persisted?
     assert_equal true, is_saved
   end
 
   def test_you_can_tell_if_paintings_are_unsaved
     painting = Painting.new
     painting.save
-    is_saved = painting.some_method # <-- your work goes here
+    is_saved = painting.persisted?
     assert_equal true, is_saved
 
     painting = Painting.new name: 'The Last Supper'
     painting.save
-    is_saved = painting.some_method # <-- your work goes here
+    is_saved = painting.new_record?
     assert_equal false, is_saved
   end
 
   def test_create_an_artist_with_3_paintings_using_array_syntax
-    artist = '??' # <-- your work goes here
+    artist = Artist.create! name: "Leonardo Da Vinci",
+      paintings: [Painting.new(name: "Mona Lisa", price: 111_111_11),
+                  Painting.new(name: "The Last Supper", price: 222_222_22),
+                  Painting.new(name: "St. John the Baptist", price: 333_333_33)]
     assert_equal 'Leonardo Da Vinci',    artist.name
     assert_equal 3,                      artist.paintings.count
     assert_equal 'Mona Lisa',            artist.paintings.first.name
@@ -197,7 +214,12 @@ class MakingRecords < Minitest::Test
   end
 
   def test_create_an_artist_with_3_paintings_using_block_syntax
-    artist = '??' # <-- your work goes here
+    artist = Artist.create! name: "Leonardo Da Vinci" do |artist|
+      artist.paintings.build name: "Mona Lisa", price: 111_111_11
+      artist.paintings.build name: "The Last Supper", price: 222_222_22
+      artist.paintings.build name: "St. John the Baptist", price: 333_333_33
+    end
+
     assert_equal 'Leonardo Da Vinci',    artist.name
     assert_equal 3,                      artist.paintings.count
     assert_equal 'Mona Lisa',            artist.paintings.first.name
@@ -211,11 +233,10 @@ class MakingRecords < Minitest::Test
   def test_create_a_record_only_once
     Painting.delete_all
     10.times do
-      # <-- your work goes here
+      Painting.find_or_create_by name: "Mona Lisa", price: 111_222_33
     end
     assert_equal 1,           Painting.count
     assert_equal 'Mona Lisa', Painting.first.name
     assert_equal 111_222_33,  Painting.first.price
   end
 end
-

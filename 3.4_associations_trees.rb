@@ -4,17 +4,29 @@ ActiveRecord::Schema.define do
   self.verbose = false
 
   # MIGRATIONS
-  # <-- your work goes here
+  create_table :trees do |t|
+    t.string :tree
+  end
+
+
+  create_table :leaves do |t|
+    t.boolean :diseased
+    t.integer :tree_id
+  end
 end
 
 
 # MODELS
-# <-- your work goes here
+class Tree < ActiveRecord::Base
+  has_many :leaves
+end
 
+class Leaf < ActiveRecord::Base
+  belongs_to :tree
+end
 # FIX THE INFLECTION
 ActiveSupport::Inflector.inflections do |inflect|
-  inflect.irregular 'clothing', 'clothes' # this one is an example
-  # <-- your work goes here
+  inflect.irregular 'leaf', 'leaves'
 end
 
 

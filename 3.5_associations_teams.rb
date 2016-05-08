@@ -4,13 +4,61 @@ ActiveRecord::Schema.define do
   self.verbose = false
 
   # MIGRATIONS
-  # <-- your work goes here
+  create_table :teams do |t|
+    t.string :name
+  end
+
+  create_table :players do |t|
+    t.string  :name
+    t.float :batting_average, default: 0.0
+    t.integer :team_id
+  end
+
+  create_table :fans do |t|
+    t.string :name
+  end
+
+  create_table :fan_teams do |t|
+    t.integer :team_id
+    t.integer :fan_id
+  end
+
+  create_table :fan_players do |t|
+    t.integer :player_id
+    t.integer :fan_id
+  end
 end
 
 
 # MODELS
-# <-- your work goes here
+class Team < ActiveRecord::Base
+  has_many :players
+  has_many :fan_teams
+  has_many :fans, through: :fan_teams
+end
 
+class Player < ActiveRecord::Base
+  belongs_to :team
+  has_many :fan_players
+  has_many :fans, through: :fan_players
+end
+
+class Fan < ActiveRecord::Base
+  has_many :fan_teams
+  has_many :fan_players
+  has_many :teams, through: :fan_teams
+  has_many :players, through: :fan_players
+end
+
+class FanTeam < ActiveRecord::Base
+  belongs_to :team
+  belongs_to :fan
+end
+
+class FanPlayer < ActiveRecord::Base
+  belongs_to :player
+  belongs_to :fan
+end
 
 # TESTS
 class TeamsTest < Minitest::Test

@@ -4,14 +4,58 @@ ActiveRecord::Schema.define do
   self.verbose = false
 
   # MIGRATIONS
-  # <-- your work goes here
+  create_table :teachers do |t|
+    t.string :name
+  end
+
+  create_table :courses do |t|
+    t.string  :name
+    t.integer :teacher_id
+  end
+
+  create_table :students do |t|
+    t.string :name
+    t.string :contact_info
+  end
+
+  create_table :grades do |t|
+    t.string  :letter
+    t.integer :percentage
+  end
+
+  create_table :enrollments do |t|
+    t.integer :student_id
+    t.integer :course_id
+    t.integer :grade_id
+  end
 end
 
 
 # MODELS
-# <-- your work goes here
+class Student < ActiveRecord::Base
+  has_many :enrollments
+  has_many :courses, through: :enrollments
+end
 
+class Course < ActiveRecord::Base
+  belongs_to :teacher
+  has_many :enrollments
+  has_many :students, through: :enrollments
+end
 
+class Teacher < ActiveRecord::Base
+  has_many :courses
+end
+
+class Grade < ActiveRecord::Base
+  has_many :enrollemnts
+end
+
+class Enrollment < ActiveRecord::Base
+  belongs_to :student
+  belongs_to :course
+  belongs_to :grade
+end
 # TESTS
 class SchoolTest < Minitest::Test
   def test_teachers_have_a_name

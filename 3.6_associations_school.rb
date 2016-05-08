@@ -34,7 +34,9 @@ end
 # MODELS
 class Student < ActiveRecord::Base
   has_many :enrollments
-  has_many :courses, through: :enrollments
+  has_many :courses,  through: :enrollments
+  has_many :teachers, through: :courses
+  has_many :grades,   through: :enrollments
 end
 
 class Course < ActiveRecord::Base
@@ -45,10 +47,13 @@ end
 
 class Teacher < ActiveRecord::Base
   has_many :courses
+  has_many :students, through: :courses
 end
 
 class Grade < ActiveRecord::Base
-  has_many :enrollemnts
+  has_many :enrollments
+  has_many :students, through: :enrollments
+  has_many :courses, through: :enrollments
 end
 
 class Enrollment < ActiveRecord::Base
